@@ -1,3 +1,5 @@
+const { resolve } = require('node:path');
+
 const createPattern = packageName => [
   {
     group: ['**/dist', '**/dist/**'],
@@ -19,23 +21,60 @@ const createPattern = packageName => [
     message: 'Do not import package itself',
     allowTypeImports: false,
   },
+  {
+    group: ['@blocksuite/store'],
+    message: "Import from '@blocksuite/global/utils'",
+    importNames: ['assertExists', 'assertEquals'],
+  },
+  {
+    group: ['react-router-dom'],
+    message: 'Use `useNavigateHelper` instead',
+    importNames: ['useNavigate'],
+  },
+  {
+    group: ['next-auth/react'],
+    message: "Import hooks from 'use-current-user.tsx'",
+    // useSession is type unsafe
+    importNames: ['useSession'],
+  },
+  {
+    group: ['next-auth/react'],
+    message: "Import hooks from 'cloud-utils.ts'",
+    importNames: ['signIn', 'signOut'],
+  },
+  {
+    group: ['yjs'],
+    message: 'Do not use this API because it has a bug',
+    importNames: ['mergeUpdates'],
+  },
+  {
+    group: ['@affine/env/constant'],
+    message:
+      'Do not import from @affine/env/constant. Use `environment.isDesktop` instead',
+    importNames: ['isDesktop'],
+  },
 ];
 
 const allPackages = [
-  'cli',
-  'component',
-  'debug',
-  'env',
-  'graphql',
-  'hooks',
-  'i18n',
-  'jotai',
-  'native',
-  'plugin-infra',
-  'templates',
-  'theme',
-  'workspace',
-  'y-indexeddb',
+  'packages/backend/server',
+  'packages/frontend/component',
+  'packages/frontend/core',
+  'packages/frontend/electron',
+  'packages/frontend/graphql',
+  'packages/frontend/hooks',
+  'packages/frontend/i18n',
+  'packages/frontend/native',
+  'packages/frontend/templates',
+  'packages/frontend/workspace',
+  'packages/common/debug',
+  'packages/common/env',
+  'packages/common/infra',
+  'packages/common/sdk',
+  'packages/common/theme',
+  'packages/common/y-indexeddb',
+  'packages/plugins/copilot',
+  'tools/cli',
+  'tests/storybook',
 ];
 
 /**
@@ -48,7 +87,7 @@ const config = {
       version: 'detect',
     },
     next: {
-      rootDir: 'apps/web',
+      rootDir: 'packages/frontend/core',
     },
   },
   extends: [
@@ -57,6 +96,7 @@ const config = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:@typescript-eslint/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -67,25 +107,32 @@ const config = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    project: resolve(__dirname, './tsconfig.eslint.json'),
   },
   plugins: [
     'react',
     '@typescript-eslint',
     'simple-import-sort',
-    'import',
+    'sonarjs',
+    'i',
     'unused-imports',
     'unicorn',
   ],
   rules: {
+    'array-callback-return': 'error',
     'no-undef': 'off',
     'no-empty': 'off',
     'no-func-assign': 'off',
     'no-cond-assign': 'off',
+    'no-constant-binary-expression': 'error',
+    'no-constructor-return': 'error',
     'react/prop-types': 'off',
+    'react/jsx-no-useless-fragment': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
-    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
@@ -97,7 +144,15 @@ const config = {
     'unused-imports/no-unused-imports': 'error',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
-    '@typescript-eslint/ban-ts-comment': 0,
+    '@typescript-eslint/ban-ts-comment': [
+      'error',
+      {
+        'ts-expect-error': 'allow-with-description',
+        'ts-ignore': true,
+        'ts-nocheck': true,
+        'ts-check': false,
+      },
+    ],
     '@typescript-eslint/no-restricted-imports': [
       'error',
       {
@@ -112,6 +167,32 @@ const config = {
             message: "Don't import from src",
             allowTypeImports: false,
           },
+          {
+            group: ['@blocksuite/store'],
+            message: "Import from '@blocksuite/global/utils'",
+            importNames: ['assertExists', 'assertEquals'],
+          },
+          {
+            group: ['react-router-dom'],
+            message: 'Use `useNavigateHelper` instead',
+            importNames: ['useNavigate'],
+          },
+          {
+            group: ['next-auth/react'],
+            message: "Import hooks from 'use-current-user.tsx'",
+            // useSession is type unsafe
+            importNames: ['useSession'],
+          },
+          {
+            group: ['next-auth/react'],
+            message: "Import hooks from 'cloud-utils.ts'",
+            importNames: ['signIn', 'signOut'],
+          },
+          {
+            group: ['yjs'],
+            message: 'Do not use this API because it has a bug',
+            importNames: ['mergeUpdates'],
+          },
         ],
       },
     ],
@@ -122,10 +203,27 @@ const config = {
         ignore: ['^\\[[a-zA-Z0-9-_]+\\]\\.tsx$'],
       },
     ],
+    'unicorn/no-unnecessary-await': 'error',
+    'sonarjs/no-all-duplicated-branches': 'error',
+    'sonarjs/no-element-overwrite': 'error',
+    'sonarjs/no-empty-collection': 'error',
+    'sonarjs/no-extra-arguments': 'error',
+    'sonarjs/no-identical-conditions': 'error',
+    'sonarjs/no-identical-expressions': 'error',
+    'sonarjs/no-ignored-return': 'error',
+    'sonarjs/no-one-iteration-loop': 'error',
+    'sonarjs/no-use-of-empty-return-value': 'error',
+    'sonarjs/non-existent-operator': 'error',
+    'sonarjs/no-collapsible-if': 'error',
+    'sonarjs/no-same-line-conditional': 'error',
+    'sonarjs/no-duplicated-branches': 'error',
+    'sonarjs/no-collection-size-mischeck': 'error',
+    'sonarjs/no-useless-catch': 'error',
+    'sonarjs/no-identical-functions': 'error',
   },
   overrides: [
     {
-      files: 'apps/server/**/*.ts',
+      files: 'packages/backend/server/**/*.ts',
       rules: {
         '@typescript-eslint/consistent-type-imports': 0,
       },
@@ -137,7 +235,10 @@ const config = {
       },
     },
     ...allPackages.map(pkg => ({
-      files: [`packages/${pkg}/src/**/*.ts`, `packages/${pkg}/src/**/*.tsx`],
+      files: [`${pkg}/src/**/*.ts`, `${pkg}/src/**/*.tsx`],
+      parserOptions: {
+        project: resolve(__dirname, './tsconfig.eslint.json'),
+      },
       rules: {
         '@typescript-eslint/no-restricted-imports': [
           'error',
@@ -145,8 +246,50 @@ const config = {
             patterns: createPattern(pkg),
           },
         ],
+        '@typescript-eslint/no-floating-promises': [
+          'error',
+          {
+            ignoreVoid: false,
+            ignoreIIFE: false,
+          },
+        ],
+        '@typescript-eslint/no-misused-promises': ['error'],
+        'i/no-extraneous-dependencies': ['error'],
+        'react-hooks/exhaustive-deps': [
+          'warn',
+          {
+            additionalHooks: 'useAsyncCallback',
+          },
+        ],
       },
     })),
+    {
+      files: [
+        '**/__tests__/**/*',
+        '**/*.stories.tsx',
+        '**/*.spec.ts',
+        '**/tests/**/*',
+        'scripts/**/*',
+        '**/benchmark/**/*',
+        '**/__debug__/**/*',
+        '**/e2e/**/*',
+      ],
+      rules: {
+        '@typescript-eslint/no-non-null-assertion': 0,
+        '@typescript-eslint/ban-ts-comment': [
+          'error',
+          {
+            'ts-expect-error': false,
+            'ts-ignore': true,
+            'ts-nocheck': true,
+            'ts-check': false,
+          },
+        ],
+        '@typescript-eslint/no-floating-promises': 0,
+        '@typescript-eslint/no-misused-promises': 0,
+        '@typescript-eslint/no-restricted-imports': 0,
+      },
+    },
   ],
 };
 

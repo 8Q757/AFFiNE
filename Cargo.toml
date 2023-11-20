@@ -1,5 +1,13 @@
 [workspace]
-members = ["./packages/native"]
+resolver = "2"
+members = [
+  "./packages/frontend/native",
+  "./packages/frontend/native/schema",
+  "./packages/backend/storage",
+]
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3
 
 [profile.release]
 lto = true

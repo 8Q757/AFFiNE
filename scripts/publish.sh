@@ -2,11 +2,14 @@
 
 packages=(
   "y-indexeddb"
+  "y-provider"
+  "infra"
+  "sdk"
 )
 
 for package in "${packages[@]}"; do
-  cd "packages/$package"
-  yarn build
+  yarn nx build $package
+  cd "packages/common/$package"
 
   if [ "$NIGHTLY" = "true" ]; then
     yarn npm publish --no-git-checks --tag nightly
@@ -14,5 +17,5 @@ for package in "${packages[@]}"; do
     yarn npm publish
   fi
 
-  cd ../../
+  cd ../../../
 done

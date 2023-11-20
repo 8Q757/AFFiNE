@@ -7,8 +7,9 @@
       [
         "electron",
         "server",
-        "web",
+        "core",
         "docs",
+        "storybook",
         "component",
         "workspace",
         "env",
@@ -16,12 +17,16 @@
         "cli",
         "hooks",
         "i18n",
-        "jotai",
         "native",
         "templates",
         "y-indexeddb",
+        "y-provider",
         "debug",
-        "theme"
+        "storage",
+        "infra",
+        "plugin-cli",
+        "sdk",
+        "plugin"
       ]
     ]
   }

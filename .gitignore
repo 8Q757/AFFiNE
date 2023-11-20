@@ -13,12 +13,13 @@
 /out-tsc
 .nyc_output
 .coverage
+.swc
 
 # dependencies
 node_modules
 
 # IDEs and editors
-/.idea
+**/.idea
 .project
 .classpath
 .c9/
@@ -55,20 +56,25 @@ Thumbs.db
 .history
 
 .next
+.vercel
 out/
 storybook-static
 i18n-generated.ts
 
-/test-results/
-/playwright-report/
-/playwright/.cache/
+test-results
+playwright-report
+playwright/.cache
+download
 
 # Cache
 .eslintcache
 next-env.d.ts
+.rollup.cache
 
 # Rust
 target
 *.node
 tsconfig.node.tsbuildinfo
 lib
+affine.db
+apps/web/next-routes.conf
